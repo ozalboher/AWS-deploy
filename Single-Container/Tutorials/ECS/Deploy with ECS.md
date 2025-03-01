@@ -1,4 +1,5 @@
 # Deploying a container using AWS ECS.
+## Steps:
 1. First push to Docker hub (covered in the previous tutorial [Running container on AWS EC2 using shell](3.%20Running%20container%20on%20AWS.md))
 2. On the ECS dashboard, click on the "Create Cluster". A cluster is a logical grouping of tasks or services. Choose the cluster type and click on "Create Cluster".
 3. Create a Task. Task definition is a blueprint for the container. It includes the container image, CPU, memory, networking, and other settings.
@@ -12,3 +13,7 @@
     - Source: Anywhere ipv4
 * The task definition should have the container image URI from Docker hub.
 * Task launch type should be Fargate. OS should be Linux/Arm64 or Linux/x86_64 depending on the image architecture. From my experience the Node alpine image (When built in mac M1) should be Linux/Arm64.
+
+## Update container changes if needed:
+- If you changed some code in the app and want it to be reflected in the container (that is linked to the task in ECS), you need to build the image again and push it to Docker hub.
+- You might also need ECS to pull the latest image from Docker hub again. You can do this by going inside the task settings, and there is a deploy button(drop-down menu) where you can choose the "update service" option. If this does not work It is also possible to just create a new task revision and it will simply pull the latest URI version of the image.
