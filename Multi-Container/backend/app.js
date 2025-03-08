@@ -75,19 +75,27 @@ app.delete('/goals/:id', async (req, res) => {
   }
 });
 
-mongoose.connect(
-  `mongodb://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@mongodb:27017/course-goals?authSource=admin`,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  },
-  (err) => {
-    if (err) {
-      console.error('FAILED TO CONNECT TO MONGODB');
-      console.error(err);
-    } else {
-      console.log('CONNECTED TO MONGODB!!');
-      app.listen(80);
+// Update this connection with retry logic
+const connectWithRetry = () => {
+  console.log('Attempting MongoDB connection...');
+  
+  mongoose.connect(
+    `mongodb://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_URL}:27017/course-goals?authSource=admin`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
     }
-  }
-);
+  )
+  .then(() => {
+    console.log('CONNECTED TO MONGODB!!');
+    app.listen(80);
+  })
+  .catch(err => {
+    console.error('FAILED TO CONNECT TO MONGODB');
+    console.error(err);
+    console.log('Retrying in 5 seconds...');
+    setTimeout(connectWithRetry, 5000);
+  });
+};
+
+connectWithRetry();
