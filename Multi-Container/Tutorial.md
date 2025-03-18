@@ -2,6 +2,7 @@
 ## Before starting:
 - Since we have now multiple containers (in this example backend-nodejs and database-mongodb), we will obviously need to have them linked inside the same network in order to communicate with each other. Now usually it is done thanks to docker-compose, but since we are deploying to AWS ECS, ECS will create its own network environment in the service we will create - and the tasks associated to this service will all enjoy the same network environment. So we will have to do it manually - by translating the settings we have in docker-compose to settings that would be configured on AWS.
 - The docker-compose file has a service called 'mongodb' and inside the app.js file of the backend-nodejs service, we are connecting to the mongodb service - with the service name 'mongodb': "@mongodb:27017/course-goals?authSource=admin" . This was perfect while we used docker-compose. But in this scenario of using AWS ECS - we will have to change the name mongodb to localhost. Make it flexible by using an env variable, that we can change for local use and for AWS use.
+- We will use a load balancer for managing traffic in an efficient way, and also for health check to the route /goals. and also for a stable access point to the application (since the service might relaunch and get a new ip).with the load balancer's DNS name.
 ## Steps:
 ## Container 1 (backend-nodejs):
 1. run docker build on the backend folder. (add ENV variables to the dockerfile if needed) 
